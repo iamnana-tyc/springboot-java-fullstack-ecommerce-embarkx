@@ -1,0 +1,68 @@
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+*.jpi
+
+### Logs ###
+*.log
+logs/
+*.out
+
+### JVM crash logs ###
+hs_err_pid*
+replay_pid*
+
+### Build directories ###
+target/
+build/
+out/
+
+### Maven ###
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### Gradle ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### Spring Boot ###
+/bin/
+/tmp/
+/*.iml
+
+### IDEs & Editors ###
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+.history/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+### OS Files ###
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### Sensitive ###
+*.env
+application-*.yml
+application-*.properties
+.env.local
+.env.*
