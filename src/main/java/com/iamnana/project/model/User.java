@@ -26,7 +26,7 @@ public class User {
     @NotBlank
     @Size(max = 20)
     @Column(name = "username")
-    private String username;
+    private String userName;
 
     @NotBlank
     @Size(max = 50)
@@ -39,6 +39,11 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    public User(String userName, String email, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+    }
 
     @Getter
     @Setter
@@ -47,14 +52,6 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
-    // This handles case where user is also a seller.
-    // when user sells products.
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user",
-            cascade = {CascadeType.PERSIST,  CascadeType.MERGE},
-            orphanRemoval = true)
-    private Set<Product> products;
 
     @Getter
     @Setter
@@ -66,9 +63,12 @@ public class User {
     )
     private List<Address> addresses;
 
-    public User(String email, String username, String password) {
-        this.email = email;
-        this.username = username;
-        this.password = password;
-    }
+    // This handles case where user is also a seller.
+    // when user sells products.
+    @ToString.Exclude
+    @OneToMany(mappedBy = "user",
+            cascade = {CascadeType.PERSIST,  CascadeType.MERGE},
+            orphanRemoval = true)
+    private Set<Product> products;
+
 }
