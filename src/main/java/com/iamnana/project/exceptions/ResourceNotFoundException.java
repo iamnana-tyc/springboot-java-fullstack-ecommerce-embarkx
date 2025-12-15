@@ -12,6 +12,8 @@ public class ResourceNotFoundException extends RuntimeException {
 
     // When the field value is a numeric ID (e.g., 5)
     Long fieldId;
+
+
     public ResourceNotFoundException() {
     }
 
