@@ -1,6 +1,6 @@
 package com.iamnana.project.security.jwt;
 
-import com.iamnana.project.security.service.UserDetailsServiceImpl;
+import com.iamnana.project.security.services.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
