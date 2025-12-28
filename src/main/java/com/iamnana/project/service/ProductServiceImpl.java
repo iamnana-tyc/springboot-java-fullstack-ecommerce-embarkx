@@ -2,10 +2,13 @@ package com.iamnana.project.service;
 
 import com.iamnana.project.exceptions.APIException;
 import com.iamnana.project.exceptions.ResourceNotFoundException;
+import com.iamnana.project.model.Cart;
 import com.iamnana.project.model.Category;
 import com.iamnana.project.model.Product;
+import com.iamnana.project.payload.CartDTO;
 import com.iamnana.project.payload.ProductDTO;
 import com.iamnana.project.payload.ProductResponse;
+import com.iamnana.project.respositories.CartRepository;
 import com.iamnana.project.respositories.CategoryRepository;
 import com.iamnana.project.respositories.ProductRepository;
 import org.modelmapper.ModelMapper;
@@ -35,16 +38,17 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    CartRepository cartRepository;
+
+    @Autowired
+    CartService cartService;
+
     @Value("${project.image}")
     private String path;
 
     @Override
     public ProductDTO saveProduct(ProductDTO productDTO, Long categoryId) {
-//        //  check if product already exist or not
-//        Product existingProduct = productRepository.findByProductName(productDTO.getProductName());
-//        if (existingProduct != null)
-//            throw new APIException("The product already exist.");
-
         // First we need the category id
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(()-> new ResourceNotFoundException("Category", "categoryId", categoryId));
@@ -185,6 +189,18 @@ public class ProductServiceImpl implements ProductService {
         // save the product back to database
         Product savedProduct = productRepository.save(existingProduct);
 
+        List<Cart> carts = cartRepository.findCartsByProductId(productId);
+       List<CartDTO> cartDTOs = carts.stream().map(cart -> {
+           CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+           List<ProductDTO> products = cart.getCartItems().stream()
+                   .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
+                   .toList();
+           cartDTO.setProducts(products);
+           return cartDTO;
+       }).toList();
+
+       cartDTOs.forEach(cart -> cartService.updateProductsInCart(cart.getCartId(), productId));
+
         return modelMapper.map(savedProduct,ProductDTO.class);
     }
 
@@ -192,6 +208,9 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long productId) {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product", "productId", productId));
+
+        List<Cart> carts = cartRepository.findCartsByProductId(productId);
+        carts.forEach(cart -> cartService.deleteProductFromCart(cart.getCartId(), productId));
 
         productRepository.deleteById(productId);
     }
