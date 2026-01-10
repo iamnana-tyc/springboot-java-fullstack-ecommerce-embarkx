@@ -5,6 +5,7 @@ import com.iamnana.project.payload.CartDTO;
 import com.iamnana.project.respositories.CartRepository;
 import com.iamnana.project.service.CartService;
 import com.iamnana.project.util.AuthUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,6 +47,7 @@ public class CartController {
 
     }
 
+    @Operation(summary = "Get all carts", description = "API endpoint to get all carts")
     @GetMapping("/carts")
     public ResponseEntity<List<CartDTO>> getAllCarts() {
         List<CartDTO> allCarts = cartService.getAllCarts();
@@ -53,6 +55,7 @@ public class CartController {
         return new ResponseEntity<List<CartDTO>>(allCarts, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get cart", description = "API endpoint to get cart using the cart Id")
     @GetMapping("/carts/users/cart")
     public ResponseEntity<CartDTO> getCartById() {
         String emailId = authUtil.loggedInEmail();
@@ -64,6 +67,7 @@ public class CartController {
         return new ResponseEntity<CartDTO>(cartDTO, HttpStatus.OK);
     }
 
+    @Operation(summary = "Update cart product", description = "API endpoint to update product in cart")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product updated successfully."),
             @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
@@ -81,6 +85,7 @@ public class CartController {
 
     }
 
+    @Operation(summary = "Delete product from cart", description = "API endpoint to delete product from cart")
     @DeleteMapping("carts/{cartId}/product/{productId}")
     public ResponseEntity<String> deleteProductFromCart(
             @Parameter(description = "The cart id")
