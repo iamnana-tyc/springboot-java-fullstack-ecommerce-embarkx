@@ -34,6 +34,14 @@ public class JWTUtils {
     @Value("${spring.application.jwtCookieName}")
     private String jwtCookie;
 
+    // Method to generate jwt token from header
+    public String generateJWTFromHeader(HttpServletRequest request){
+        String jwtToken = request.getHeader("Authorization");
+        if (jwtToken != null && jwtToken.startsWith("Bearer ")){
+            return jwtToken.substring(7);
+        }
+        return null;
+    }
 
     // Method to get token from cookie
     public String getJwtFromCookie(HttpServletRequest request) {
