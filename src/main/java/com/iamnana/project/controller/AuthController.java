@@ -11,6 +11,11 @@ import com.iamnana.project.security.request.SignupRequest;
 import com.iamnana.project.security.response.MessageResponse;
 import com.iamnana.project.security.response.UserInfoResponse;
 import com.iamnana.project.security.services.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Tag(name = "Authentication", description = "APIs for managing the auth endpoints")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -47,7 +53,12 @@ public class AuthController {
     @Autowired
     RoleRepository roleRepository;
 
-
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "A user  authenticated successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content),
+    })
+    @Operation(summary = "Authenticate a user", description = "API to authenticate a user")
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest){
         Authentication authentication;
@@ -71,6 +82,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        String jwtToken = jwtUtils.generateTokenFromUsernameForCookie(userDetails.getUsername());
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream()
@@ -80,7 +92,8 @@ public class AuthController {
         UserInfoResponse loginResponse = new UserInfoResponse(
                 userDetails.getId(),
                 userDetails.getUsername(),
-                roles
+                roles,
+                jwtToken
         );
 
         return ResponseEntity.ok()
@@ -88,6 +101,12 @@ public class AuthController {
                 .body(loginResponse);
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "A user  registered successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content),
+    })
+    @Operation(summary = "Register a user", description = "API to register a user")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
         if(userRepository.existsByUserName(signupRequest.getUsername())){
@@ -141,6 +160,7 @@ public class AuthController {
 
     }
 
+    @Operation(summary = "Get current username", description = "API to get current username")
     @GetMapping("/username")
     public String getCurrentUsername(Authentication authentication){
         if (authentication != null)
@@ -149,6 +169,7 @@ public class AuthController {
             return "";
     }
 
+    @Operation(summary = "Get user details", description = "API to get user details")
     @GetMapping("/user")
     public ResponseEntity<?> getUserDetails(Authentication authentication){
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -167,6 +188,12 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Signout successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content),
+    })
+    @Operation(summary = "Sign out", description = "API to signout of system")
     @PostMapping("/signout")
     public ResponseEntity<?> signout(){
         ResponseCookie cookie = jwtUtils.generateCleanCookie();
