@@ -26,10 +26,10 @@ The API is designed to be consumed by a frontend application and follows **clean
 
 ### Technology Stack
 
-* Java
+* Java 21
 * Spring Boot
 * Spring Data JPA
-* Spring Security 7
+* Spring Security 
 * JWT (JSON Web Tokens)
 * PostgreSQL
 * Swagger / OpenAPI (springdoc)
